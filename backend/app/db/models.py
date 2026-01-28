@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from sqlalchemy import (
     Column,
     Integer,
@@ -13,6 +15,25 @@ from sqlalchemy.orm import relationship
 from datetime import datetime
 from .base import Base
 import enum
+from sqlalchemy import func
+
+
+from datetime import datetime
+import enum
+from typing import List
+
+from sqlalchemy import (
+    String,
+    Text,
+    Float,
+    ForeignKey,
+    DateTime,
+    Enum as SAEnum,
+    UniqueConstraint,
+)
+from sqlalchemy.orm import Mapped, mapped_column, relationship
+
+from .base import Base
 
 
 class ClaimType(enum.Enum):
@@ -37,44 +58,37 @@ class ClaimEffect(enum.Enum):
 class Document(Base):
     __tablename__ = "documents"
 
-    id = Column(Integer, primary_key=True)
-    title = Column(String(255), nullable=False)
-    source = Column(String(255), nullable=True)
-    content = Column(Text, nullable=False)
+    id: Mapped[int] = mapped_column(primary_key=True)
+    title: Mapped[str] = mapped_column(String(255), nullable=False)
+    source: Mapped[str | None] = mapped_column(String(255), nullable=True)
+    content: Mapped[str] = mapped_column(Text, nullable=False)
+    created_at = Column(DateTime, server_default=func.now(), nullable=False)
 
-    created_at = Column(DateTime, default=datetime.utcnow)
-
-    claims = relationship("Claim", back_populates="document")
+    claims: Mapped[List["Claim"]] = relationship(back_populates="document")
 
 
 class Claim(Base):
     __tablename__ = "claims"
 
-    id = Column(Integer, primary_key=True)
-    text = Column(Text, nullable=False)
+    id: Mapped[int] = mapped_column(primary_key=True)
+    text: Mapped[str] = mapped_column(Text, nullable=False)
+    normalized_text: Mapped[str | None] = mapped_column(Text, nullable=True)
 
-    normalized_text = Column(Text, nullable=True)
+    claim_type: Mapped[ClaimType] = mapped_column(SAEnum(ClaimType), nullable=False)
+    confidence: Mapped[float] = mapped_column(Float, default=0.5)
+    scope: Mapped[str | None] = mapped_column(String(255), nullable=True)
 
-    claim_type = Column(Enum(ClaimType), nullable=False)
+    document_id: Mapped[int] = mapped_column(ForeignKey("documents.id"), nullable=False)
+    created_at = Column(DateTime, server_default=func.now(), nullable=False)
 
-    confidence = Column(Float, default=0.5)
+    document: Mapped["Document"] = relationship(back_populates="claims")
 
-    scope = Column(String(255), nullable=True)
-
-    document_id = Column(Integer, ForeignKey("documents.id"), nullable=False)
-
-    created_at = Column(DateTime, default=datetime.utcnow)
-
-    document = relationship("Document", back_populates="claims")
-
-    outgoing_relations = relationship(
-        "ClaimRelation",
+    outgoing_relations: Mapped[List["ClaimRelation"]] = relationship(
         foreign_keys="ClaimRelation.from_claim_id",
         back_populates="from_claim",
     )
 
-    incoming_relations = relationship(
-        "ClaimRelation",
+    incoming_relations: Mapped[List["ClaimRelation"]] = relationship(
         foreign_keys="ClaimRelation.to_claim_id",
         back_populates="to_claim",
     )
@@ -83,22 +97,23 @@ class Claim(Base):
 class ClaimRelation(Base):
     __tablename__ = "claim_relations"
 
-    id = Column(Integer, primary_key=True)
+    id: Mapped[int] = mapped_column(primary_key=True)
 
-    from_claim_id = Column(Integer, ForeignKey("claims.id"), nullable=False)
-    to_claim_id = Column(Integer, ForeignKey("claims.id"), nullable=False)
+    from_claim_id: Mapped[int] = mapped_column(ForeignKey("claims.id"), nullable=False)
+    to_claim_id: Mapped[int] = mapped_column(ForeignKey("claims.id"), nullable=False)
 
-    relation_type = Column(Enum(RelationType), nullable=False)
-
-    strength = Column(Float, default=1.0)  # optional weighting
-
-    created_at = Column(DateTime, default=datetime.utcnow)
-
-    from_claim = relationship(
-        "Claim", foreign_keys=[from_claim_id], back_populates="outgoing_relations"
+    relation_type: Mapped[RelationType] = mapped_column(
+        SAEnum(RelationType), nullable=False
     )
-    to_claim = relationship(
-        "Claim", foreign_keys=[to_claim_id], back_populates="incoming_relations"
+    strength: Mapped[float] = mapped_column(Float, default=1.0)
+
+    created_at = Column(DateTime, server_default=func.now(), nullable=False)
+
+    from_claim: Mapped["Claim"] = relationship(
+        foreign_keys=[from_claim_id], back_populates="outgoing_relations"
+    )
+    to_claim: Mapped["Claim"] = relationship(
+        foreign_keys=[to_claim_id], back_populates="incoming_relations"
     )
 
     __table_args__ = (
@@ -109,49 +124,47 @@ class ClaimRelation(Base):
 class Decision(Base):
     __tablename__ = "decisions"
 
-    id = Column(Integer, primary_key=True)
+    id: Mapped[int] = mapped_column(primary_key=True)
+    title: Mapped[str] = mapped_column(String(255), nullable=False)
+    description: Mapped[str | None] = mapped_column(Text, nullable=True)
+    created_at = Column(DateTime, server_default=func.now(), nullable=False)
 
-    title = Column(String(255), nullable=False)
-    description = Column(Text, nullable=True)
-
-    created_at = Column(DateTime, default=datetime.utcnow)
-
-    options = relationship(
-        "DecisionOption", back_populates="decision", cascade="all, delete-orphan"
+    options: Mapped[List["DecisionOption"]] = relationship(
+        back_populates="decision", cascade="all, delete-orphan"
     )
 
 
 class DecisionOption(Base):
     __tablename__ = "decision_options"
 
-    id = Column(Integer, primary_key=True)
+    id: Mapped[int] = mapped_column(primary_key=True)
+    decision_id: Mapped[int] = mapped_column(ForeignKey("decisions.id"), nullable=False)
+    name: Mapped[str] = mapped_column(String(255), nullable=False)
+    created_at = Column(DateTime, server_default=func.now(), nullable=False)
 
-    decision_id = Column(Integer, ForeignKey("decisions.id"), nullable=False)
+    decision: Mapped["Decision"] = relationship(back_populates="options")
 
-    name = Column(String(255), nullable=False)  # e.g. "Use PostgreSQL"
-
-    created_at = Column(DateTime, default=datetime.utcnow)
-
-    decision = relationship("Decision", back_populates="options")
-
-    claim_links = relationship("DecisionClaimLink", back_populates="option")
+    claim_links: Mapped[List["DecisionClaimLink"]] = relationship(
+        back_populates="option"
+    )
 
 
 class DecisionClaimLink(Base):
     __tablename__ = "decision_claim_links"
 
-    id = Column(Integer, primary_key=True)
+    id: Mapped[int] = mapped_column(primary_key=True)
 
-    option_id = Column(Integer, ForeignKey("decision_options.id"), nullable=False)
-    claim_id = Column(Integer, ForeignKey("claims.id"), nullable=False)
+    option_id: Mapped[int] = mapped_column(
+        ForeignKey("decision_options.id"), nullable=False
+    )
+    claim_id: Mapped[int] = mapped_column(ForeignKey("claims.id"), nullable=False)
 
-    effect = Column(Enum(ClaimEffect), nullable=False)
+    effect: Mapped[ClaimEffect] = mapped_column(SAEnum(ClaimEffect), nullable=False)
+    weight: Mapped[float] = mapped_column(Float, default=1.0)
 
-    weight = Column(Float, default=1.0)
+    created_at = Column(DateTime, server_default=func.now(), nullable=False)
 
-    created_at = Column(DateTime, default=datetime.utcnow)
-
-    option = relationship("DecisionOption", back_populates="claim_links")
-    claim = relationship("Claim")
+    option: Mapped["DecisionOption"] = relationship(back_populates="claim_links")
+    claim: Mapped["Claim"] = relationship()
 
     __table_args__ = (UniqueConstraint("option_id", "claim_id", "effect"),)

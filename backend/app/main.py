@@ -1,8 +1,12 @@
-from fastapi import FastAPI
+from app.db.session import SessionLocal
+from app.domain.services.decision_engine import evaluate_decision
 
-app = FastAPI(title="Arbiter")
+if __name__ == "__main__":
+    db = SessionLocal()
+    result = evaluate_decision(decision_id=1, db=db)
 
-
-@app.get("/health")
-def health():
-    return {"status": "ok"}
+    print("Decision:", result.decision_id)
+    for r in result.ranked_options:
+        print("Option", r.option_id, "=>", r.score)
+        for reason in r.reasons:
+            print("   ", reason)
