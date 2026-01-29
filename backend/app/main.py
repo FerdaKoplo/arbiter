@@ -1,12 +1,20 @@
+from fastapi import FastAPI, Depends
+from sqlalchemy.orm import Session
 from app.db.session import SessionLocal
 from app.domain.services.decision_engine import evaluate_decision
 
-if __name__ == "__main__":
-    db = SessionLocal()
-    result = evaluate_decision(decision_id=1, db=db)
+app = FastAPI()
 
-    print("Decision:", result.decision_id)
-    for r in result.ranked_options:
-        print("Option", r.option_id, "=>", r.score)
-        for reason in r.reasons:
-            print("   ", reason)
+
+def get_db():
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
+
+
+@app.get("/decisions/{decision_id}")
+async def get_decision(decision_id: int, db: Session = Depends(get_db)):
+    result = await evaluate_decision(decision_id, db)
+    return result
