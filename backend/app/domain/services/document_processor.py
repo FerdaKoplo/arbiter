@@ -9,7 +9,7 @@ UPLOAD_DIR = "storage/pdfs"
 os.makedirs(UPLOAD_DIR, exist_ok=True)
 
 
-def process_and_save_document(db: Session, file: UploadFile):
+def process_and_save_document(db: Session, file: UploadFile, decision_id: int):
     file_location = f"{UPLOAD_DIR}/{file.filename}"
 
     with open(file_location, "wb") as buffer:
@@ -25,6 +25,7 @@ def process_and_save_document(db: Session, file: UploadFile):
         title=file.filename,
         source="upload",
         content=text_content,
+        decision_id=decision_id,
     )
     db.add(db_doc)
     db.commit()

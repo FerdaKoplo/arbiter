@@ -1,35 +1,19 @@
 from __future__ import annotations
 
-from sqlalchemy import (
-    Column,
-    Integer,
-    String,
-    Text,
-    Float,
-    ForeignKey,
-    DateTime,
-    Enum,
-    UniqueConstraint,
-)
-from sqlalchemy.orm import relationship
-from datetime import datetime
-from .base import Base
 import enum
-from sqlalchemy import func
-
-
 from datetime import datetime
-import enum
 from typing import List
 
 from sqlalchemy import (
-    String,
-    Text,
-    Float,
-    ForeignKey,
+    Column,
     DateTime,
     Enum as SAEnum,
+    Float,
+    ForeignKey,
+    String,
+    Text,
     UniqueConstraint,
+    func,
 )
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
@@ -55,16 +39,40 @@ class ClaimEffect(enum.Enum):
     blocks = "blocks"
 
 
+class Decision(Base):
+    __tablename__ = "decisions"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    title: Mapped[str] = mapped_column(String(255), nullable=False)
+    description: Mapped[str | None] = mapped_column(Text, nullable=True)
+    created_at = Column(DateTime, server_default=func.now(), nullable=False)
+
+    options: Mapped[List["DecisionOption"]] = relationship(
+        back_populates="decision", cascade="all, delete-orphan"
+    )
+
+    documents: Mapped[List["Document"]] = relationship(
+        back_populates="decision", cascade="all, delete-orphan"
+    )
+
+
 class Document(Base):
     __tablename__ = "documents"
 
     id: Mapped[int] = mapped_column(primary_key=True)
+
+    decision_id: Mapped[int | None] = mapped_column(
+        ForeignKey("decisions.id"), nullable=True
+    )
+
     title: Mapped[str] = mapped_column(String(255), nullable=False)
     source: Mapped[str | None] = mapped_column(String(255), nullable=True)
     content: Mapped[str] = mapped_column(Text, nullable=False)
     created_at = Column(DateTime, server_default=func.now(), nullable=False)
 
     claims: Mapped[List["Claim"]] = relationship(back_populates="document")
+
+    decision: Mapped["Decision"] = relationship(back_populates="documents")
 
 
 class Claim(Base):
@@ -118,19 +126,6 @@ class ClaimRelation(Base):
 
     __table_args__ = (
         UniqueConstraint("from_claim_id", "to_claim_id", "relation_type"),
-    )
-
-
-class Decision(Base):
-    __tablename__ = "decisions"
-
-    id: Mapped[int] = mapped_column(primary_key=True)
-    title: Mapped[str] = mapped_column(String(255), nullable=False)
-    description: Mapped[str | None] = mapped_column(Text, nullable=True)
-    created_at = Column(DateTime, server_default=func.now(), nullable=False)
-
-    options: Mapped[List["DecisionOption"]] = relationship(
-        back_populates="decision", cascade="all, delete-orphan"
     )
 
 

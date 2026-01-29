@@ -18,24 +18,57 @@ from app.db.models import (
 
 def seed(db: Session):
     print("Seeding database...")
+
+    print("... Creating Decisions")
+    decisions = []
+    for i in range(10):
+        d = Decision(
+            title=f"Decision {i + 1}: Strategic Move",
+            description="Synthetic decision scenario for testing.",
+        )
+        db.add(d)
+        decisions.append(d)
+
+    db.commit()
+
+    print("   ... Creating Decision Options")
+    options = []
+    for d in decisions:
+        for j in range(3):
+            o = DecisionOption(
+                decision=d,
+                name=f"Option {j + 1} for {d.title}",
+            )
+            db.add(o)
+            options.append(o)
+
+    db.commit()
+
+    print("... Creating Documents with Context Links")
     docs = []
     for i in range(50):
+        assigned_decision_id = None
+        if random.random() < 0.3:
+            assigned_decision_id = random.choice(decisions).id
+
         d = Document(
             title=f"Document {i + 1}",
-            source="synthetic",
-            content=f"This is synthetic document {i + 1}",
+            source="synthetic_seed",
+            content=f"This is synthetic document {i + 1}. It contains important claims about the world.",
+            decision_id=assigned_decision_id,  # <--- LINKING HERE
         )
         db.add(d)
         docs.append(d)
 
     db.commit()
 
+    print("   ... Creating Claims")
     claims = []
     for i in range(1000):
         doc = random.choice(docs)
 
         c = Claim(
-            text=f"Claim {i + 1}: something something",
+            text=f"Claim {i + 1}: something something important",
             normalized_text=None,
             claim_type=random.choice(list(ClaimType)),
             confidence=round(random.uniform(0.3, 0.99), 3),
@@ -47,8 +80,8 @@ def seed(db: Session):
 
     db.commit()
 
+    print(" ... Building Knowledge Graph (Claim Relations)")
     existing = set()
-
     for _ in range(2000):
         a = random.choice(claims)
         b = random.choice(claims)
@@ -70,35 +103,11 @@ def seed(db: Session):
             relation_type=rel_type,
             strength=round(random.uniform(0.1, 1.0), 3),
         )
-
         db.add(rel)
 
     db.commit()
 
-    decisions = []
-    for i in range(10):
-        d = Decision(
-            title=f"Decision {i + 1}",
-            description="Synthetic decision",
-        )
-        db.add(d)
-        decisions.append(d)
-
-    db.commit()
-
-    options = []
-
-    for d in decisions:
-        for j in range(5):
-            o = DecisionOption(
-                decision=d,
-                name=f"Option {j + 1} for {d.title}",
-            )
-            db.add(o)
-            options.append(o)
-
-    db.commit()
-
+    print("   ... Linking Claims to Decision Options")
     claim_clusters = []
     for i in range(50):
         cluster = random.sample(claims, 10)
@@ -131,7 +140,7 @@ def seed(db: Session):
 
     db.commit()
 
-    print("✅ Seeding complete.")
+    print("Seeding complete.")
 
 
 if __name__ == "__main__":

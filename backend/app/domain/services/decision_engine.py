@@ -4,6 +4,7 @@ from sqlalchemy.orm import Session
 import time
 import random
 
+from app.db.models import Document
 from app.domain.repository import DecisionRepository
 from app.core.scoring import score_option_with_propagation
 from app.core.gemini import extract_claims_from_text
@@ -58,6 +59,10 @@ def gemini_worker(doc_text, retries=3):
 async def evaluate_decision(decision_id: int, db: Session):
     repo = DecisionRepository(db)
     options = repo.get_options(decision_id)
+
+    decision_docs = db.query(Document).filter(Document.decision_id == decision_id).all()
+    decision_doc_texts = [d.content for d in decision_docs]
+
     results = []
 
     loop = asyncio.get_running_loop()
@@ -67,13 +72,15 @@ async def evaluate_decision(decision_id: int, db: Session):
         links = repo.get_links_for_option(option.id)
         score, reasons = score_option_with_propagation(links)
 
-        document_texts = repo.get_documents_for_option(option.id)
+        option_doc_texts = repo.get_documents_for_option(option.id)
 
-        # Run Gemini calls in parallel threads
+        all_texts_to_check = option_doc_texts + decision_doc_texts
+
         tasks = [
             loop.run_in_executor(executor, gemini_worker, doc_text)
-            for doc_text in document_texts
+            for doc_text in all_texts_to_check
         ]
+
         gemini_results = await asyncio.gather(*tasks)
 
         for result in gemini_results:

@@ -24,9 +24,14 @@ async def get_decision(decision_id: int, db: Session = Depends(get_db)):
 @app.post("/documents/upload")
 async def upload_document(
     background_tasks: BackgroundTasks,
+    decision_id: int,
     file: UploadFile = File(...),
     db: Session = Depends(get_db),
 ):
-    background_tasks.add_task(process_and_save_document, db, file)
+    background_tasks.add_task(process_and_save_document, db, file, decision_id)
 
-    return {"filename": file.filename, "status": "processing_started"}
+    return {
+        "filename": file.filename,
+        "status": "processing_started",
+        "linked_to_decision": decision_id,
+    }
