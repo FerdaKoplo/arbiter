@@ -11,7 +11,7 @@ from app.core.gemini import extract_claims_from_text
 
 import asyncio
 from concurrent.futures import ThreadPoolExecutor
-from app.core.gemini import extract_claims_from_text
+from app.core.gemini import extract_claims_from_text, generate_consultant_report
 
 
 @dataclass
@@ -91,6 +91,31 @@ async def evaluate_decision(decision_id: int, db: Session):
                 reasons.append(result)
 
         results.append(OptionScore(option_id=option.id, score=score, reasons=reasons))
+        pass
 
     results.sort(key=lambda x: x.score, reverse=True)
-    return DecisionResult(decision_id=decision_id, ranked_options=results)
+
+    consultant_report = ""
+
+    if results:
+        winner = results[0]
+        print(f"Generating Consultant Report for winner: Option {winner.option_id}...")
+
+        winner_option_docs = repo.get_documents_for_option(winner.option_id)
+        all_context = decision_doc_texts + winner_option_docs
+
+        try:
+            consultant_report = generate_consultant_report(
+                winning_option_name=f"Option {winner.option_id}",
+                winning_score=winner.score,
+                engine_reasons=winner.reasons,
+                all_document_texts=all_context,
+            )
+        except Exception as e:
+            consultant_report = f"Error generating report: {str(e)}"
+
+    return {
+        "decision_id": decision_id,
+        "ranked_options": results,
+        "consultant_report": consultant_report,
+    }
