@@ -51,12 +51,12 @@ const UploadDocument: React.FC<UploadDocumentProps> = ({ decisionId }) => {
   };
 
   return (
-    <div className="w-full max-w-md mx-auto">
+    <div className="w-full max-w-xl mx-auto">
       <div
-        className={`relative flex flex-col items-center justify-center w-full h-48 border-2 border-dashed rounded-xl transition-all duration-200 ease-in-out
-          ${dragActive ? "border-indigo-500 bg-indigo-50" : "border-slate-300 bg-slate-50"}
-          ${isSuccess ? "border-green-500 bg-green-50" : ""}
-          ${isError ? "border-red-500 bg-red-50" : ""}
+        className={`relative flex flex-col items-center justify-center w-full h-56 border-2 border-dashed rounded-3xl transition-all duration-300
+          ${dragActive ? "border-white bg-white/40 scale-[1.02]" : "border-white/40 bg-white/10"}
+          ${isSuccess ? "border-green-400 bg-green-400/20" : ""}
+          ${isError ? "border-red-400 bg-red-400/20" : ""}
         `}
         onDragEnter={handleDrag}
         onDragLeave={handleDrag}
@@ -64,48 +64,31 @@ const UploadDocument: React.FC<UploadDocumentProps> = ({ decisionId }) => {
         onDrop={handleDrop}
       >
         <label className="flex flex-col items-center justify-center w-full h-full cursor-pointer">
-          {isPending && (
-            <div className="flex flex-col items-center text-indigo-600 animate-pulse">
-              <Loader2 className="w-10 h-10 mb-2 animate-spin" />
-              <p className="text-sm font-semibold">Analyzing Document...</p>
-            </div>
-          )}
-
-          {!isPending && isSuccess && (
-            <div className="flex flex-col items-center text-green-600">
-              <CheckCircle className="w-10 h-10 mb-2" />
-              <p className="text-sm font-semibold">Upload Complete!</p>
-              <p className="text-xs text-green-500 mt-1">Upload another?</p>
-            </div>
-          )}
-
-          {!isPending && isError && (
-            <div className="flex flex-col items-center text-red-500">
-              <AlertCircle className="w-10 h-10 mb-2" />
-              <p className="text-sm font-semibold">Upload Failed</p>
-              <p className="text-xs mt-1">Try again</p>
-            </div>
-          )}
-
-          {!isPending && !isSuccess && !isError && (
-            <>
-              <div className="p-4 bg-white rounded-full shadow-sm mb-3">
-                <UploadCloud
-                  className={`w-8 h-8 ${dragActive ? "text-indigo-600" : "text-slate-400"}`}
-                />
-              </div>
-              <p className="mb-2 text-sm text-slate-700 font-medium">
-                <span className="font-bold text-indigo-600">
-                  Click to upload
-                </span>{" "}
-                or drag and drop
+          {isPending ? (
+            <div className="flex flex-col items-center text-white">
+              <Loader2 className="w-12 h-12 mb-3 animate-spin drop-shadow-md" />
+              <p className="text-lg font-black tracking-tight">
+                ANALYZING DOCUMENT...
               </p>
-              <p className="text-xs text-slate-500 flex items-center gap-1">
-                <FileText size={12} /> PDF (MAX. 10MB)
+            </div>
+          ) : isSuccess ? (
+            <div className="flex flex-col items-center text-white">
+              <CheckCircle className="w-12 h-12 mb-3 drop-shadow-md" />
+              <p className="text-lg font-black">COMPLETE</p>
+            </div>
+          ) : (
+            <>
+              <div className="p-5 bg-white/30 rounded-full shadow-lg border border-white/50 mb-4 transition-transform hover:scale-110">
+                <UploadCloud className="w-10 h-10 text-white" />
+              </div>
+              <p className="mb-2 text-lg text-white font-black tracking-tight drop-shadow-sm text-center">
+                DRAG & DROP EVIDENCE
+              </p>
+              <p className="text-[10px] text-white/70 font-black tracking-[0.2em] flex items-center gap-2">
+                <FileText size={14} /> PDF ONLY (10MB MAX)
               </p>
             </>
           )}
-
           <input
             type="file"
             className="hidden"

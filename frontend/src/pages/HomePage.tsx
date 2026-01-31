@@ -6,74 +6,80 @@ import { ArrowRight, BrainCircuit, Loader2 } from "lucide-react";
 const HomePage = () => {
   const [title, setTitle] = useState<string>("");
   const navigate = useNavigate();
-
   const { mutate: create, isPending } = useCreateDecision();
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!title.trim()) return;
-
     create(title, {
       onSuccess: (newDecision) => {
-        console.log("SERVER RESPONSE:", newDecision); // <--- Add this!
-
-        if (newDecision && newDecision.id) {
-          navigate(`/decisions/${newDecision.id}`);
-        } else {
-          alert("Error: No ID returned. Check Console.");
-        }
-      },
-      onError: (error) => {
-        console.error("API ERROR:", error);
-        alert("Failed to create decision.");
+        if (newDecision?.id) navigate(`/decisions/${newDecision.id}`);
       },
     });
   };
+
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen px-4 bg-slate-50">
-      <div className="w-full max-w-lg p-8 bg-white border shadow-xl rounded-2xl border-slate-100">
-        <div className="flex justify-center mb-6 text-indigo-600">
-          <BrainCircuit size={64} strokeWidth={1.5} />
+    <div className="relative flex flex-col items-center justify-center min-h-screen px-4 overflow-hidden bg-linear-to-br from-[#0078D7] via-[#24e0ff] to-[#72ff8d]">
+      <div className="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] bg-white/20 blur-[120px] rounded-full animate-pulse" />
+      <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-emerald-300/40 blur-[150px] rounded-full" />
+
+      <div className="relative w-full max-w-lg p-10 bg-white/40 backdrop-blur-3xl rounded-[3rem] border border-white/60 shadow-[0_25px_50px_-12px_rgba(0,0,0,0.25)] overflow-hidden">
+        <div className="absolute top-0 left-0 w-full h-[40%] bg-linear-to-b from-white/50 to-transparent pointer-events-none" />
+
+        <div className="relative z-10">
+          <h1 className="mb-2 text-5xl font-black text-center text-white/70 drop-shadow-sm">
+            ARBITER ENGINE
+          </h1>
+          <p className="mb-10 font-bold text-center text-white/70">
+            Analyze trade-offs. Make the right call.
+          </p>
+          {/* <div className="absolute top-0 left-0 w-full h-[45%] bg-linear-to-b from-white/40 to-transparent" /> */}
+
+          <form onSubmit={handleSubmit} className="space-y-6">
+            <div className="group">
+              <label className="block mb-2 ml-2 text-xs font-black tracking-widest text-white uppercase">
+                What decision are you making?
+              </label>
+              <input
+                type="text"
+                placeholder="e.g. Should we migrate to AWS?"
+                className="w-full p-5 text-lg font-medium transition-all bg-white border-2 shadow-inner rounded-2xl border-white/80 focus:ring-4 focus:ring-black/10 outline-none placeholder:text-slate-400 text-slate-800"
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
+              />
+            </div>
+
+            <button
+              type="submit"
+              disabled={!title.trim() || isPending}
+              className="relative flex items-center justify-center w-full gap-3 p-5 text-xl font-black text-white transition-all overflow-hidden rounded-2xl
+                bg-white/10 hover:brightness-110 active:scale-[0.98]
+                shadow-[0_8px_20px_rgba(0,120,215,0.4)]
+                border-t border-white/50 disabled:opacity-50"
+            >
+              <div className="absolute top-0 left-0 w-full h-[45%] bg-gradient-to-b from-white/40 to-transparent" />
+
+              <span className="relative z-10 drop-shadow-md">
+                {isPending ? (
+                  <Loader2 className="animate-spin" />
+                ) : (
+                  "Start Analysis"
+                )}
+              </span>
+              {!isPending && (
+                <ArrowRight
+                  size={24}
+                  className="relative z-10 transition-transform group-hover:translate-x-1"
+                />
+              )}
+            </button>
+          </form>
         </div>
+      </div>
 
-        <h1 className="mb-2 text-3xl font-bold text-center text-slate-800">
-          Arbiter Engine
-        </h1>
-        <p className="mb-8 text-center text-slate-500">
-          Upload evidence. Analyze trade-offs. Make the right call.
-        </p>
-
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <label className="block mb-2 text-sm font-semibold text-slate-700">
-              What decision are you making?
-            </label>
-            <input
-              type="text"
-              placeholder="e.g. Should we migrate to AWS or stay on-prem?"
-              className="w-full p-4 text-lg border-2 rounded-xl border-slate-200 focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 outline-none transition-all"
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              autoFocus
-            />
-          </div>
-
-          <button
-            type="submit"
-            disabled={!title.trim() || isPending}
-            className="flex items-center justify-center w-full gap-2 p-4 text-lg font-bold text-white transition-all bg-indigo-600 rounded-xl hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            {isPending ? (
-              <>
-                <Loader2 className="animate-spin" /> Creating Project...
-              </>
-            ) : (
-              <>
-                Start Analysis <ArrowRight size={20} />
-              </>
-            )}
-          </button>
-        </form>
+      {/* Footer Branding (Vista style) */}
+      <div className="mt-8 text-sm font-bold text-white/80 drop-shadow-md">
+        © 2026 Arbiter Systems Corp
       </div>
     </div>
   );

@@ -8,28 +8,41 @@ const DecisionPage = () => {
 
   if (isNaN(decisionId)) return <div>Invalid ID</div>;
   return (
-    <div className="max-w-7xl mx-auto p-6 lg:p-10">
-      <header className="mb-8">
-        <h1 className="text-3xl font-bold text-slate-900">
-          Decision #{decisionId}
-        </h1>
-        <p className="text-slate-500">Project Workspace</p>
-      </header>
+    <div className="relative min-h-screen px-4 py-10 overflow-x-hidden bg-linear-to-br from-[#0078D7] via-[#24e0ff] to-[#72ff8d]">
+      <div className="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] bg-white/10 blur-[120px] rounded-full" />
+      <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-emerald-400/20 blur-[150px] rounded-full" />
 
-      <div className="grid grid-cols-1 gap-10">
-        <section className="bg-slate-50 p-6 rounded-2xl border border-slate-200">
-          <h2 className="text-lg font-semibold text-slate-800 mb-4 flex items-center gap-2">
-            1. Add Evidence
-            <span className="text-xs font-normal text-slate-500 bg-white px-2 py-1 rounded-full border">
-              PDF Support
-            </span>
-          </h2>
-          <UploadDocument decisionId={decisionId} />
-        </section>
+      <div className="relative z-10 max-w-7xl mx-auto">
+        <header className="mb-10 ml-4">
+          <h1 className="text-4xl font-black text-white drop-shadow-md tracking-tight uppercase">
+            Decision #{decisionId}
+          </h1>
+          <p className="text-white/80 font-bold tracking-widest uppercase text-xs">
+            Project Workspace
+          </p>
+        </header>
 
-        <section>
-          <DecisionResult decisionId={decisionId} />
-        </section>
+        <div className="grid grid-cols-1 gap-10">
+          <section className="relative p-8 bg-white/30 backdrop-blur-3xl rounded-[2.5rem] border border-white/50 shadow-2xl overflow-hidden">
+            <div className="absolute top-0 left-0 w-full h-[30%] bg-linear-to-b from-white/40 to-transparent pointer-events-none" />
+
+            <h2 className="text-xl font-black text-white mb-6 flex items-center gap-3 drop-shadow-sm">
+              <span className="bg-white/40 w-8 h-8 rounded-full flex items-center justify-center text-sm">
+                1
+              </span>
+              ADD EVIDENCE
+              <span className="text-[10px] font-black text-blue-900 bg-white/60 px-3 py-1 rounded-full border border-white/50">
+                PDF SUPPORT
+              </span>
+            </h2>
+            <UploadDocument decisionId={decisionId} />
+          </section>
+
+          {/* RESULTS SECTION */}
+          <section className="relative">
+            <DecisionResult decisionId={decisionId} />
+          </section>
+        </div>
       </div>
     </div>
   );

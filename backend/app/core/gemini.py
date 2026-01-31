@@ -81,60 +81,74 @@ def generate_consultant_report(
     engine_reasons: list[str],
     all_document_texts: list[str],
 ) -> str:
-    """
-    Generates a grounded, high-level IT Consultant Report using the full context window.
-    """
-
-    # 1. Prepare Full Context (No truncation)
-    # We join all documents so the consultant sees the full picture
     full_document_context = "\n\n--- DOCUMENT SOURCE START ---\n\n".join(
         all_document_texts
     )
 
-    # 2. Strict System Prompt
     context_prompt = f"""
     You are an expert Chief Technology Officer (CTO) and Solution Architect.
     Your job is to synthesize a strategic implementation plan based *strictly* on the provided documentation and decision engine results.
     
     ### INPUT DATA
+    - **Winning Option:** "{winning_option_name}" (Score: {winning_score})
+    - **Key Evidence:** {str(engine_reasons)[:10000]}... (truncated for focus)
+    - **Source Documents:** {full_document_context[:20000]}... (truncated)
     
-    **DECISION CONTEXT:**
-    - **Winning Option:** "{winning_option_name}"
-    - **Calculated Score:** {winning_score}
+    ### ANTI-HALLUCINATION RULES:
+    1. **Source Truth:** ONLY use info found in the Source Documents.
+    2. **Silence Policy:** If the text is silent, say "Not specified."
     
-    **ENGINE REASONING LOGS (Evidence):**
-    {str(engine_reasons)}
+    ### TEMPLATE INSTRUCTIONS:
+    * **Diagram:** Generate valid `mermaid` syntax for a System Architecture.
+    * **Code:** Generate valid `sql` or `python` code blocks where requested.
+    * **Granularity:** Because you have full context, be extremely specific (e.g., quote specific budget numbers or user constraints).
     
-    **SOURCE DOCUMENTATION (The "Truth"):**
-    {full_document_context}
-    
-    ### INSTRUCTIONS
-    Generate a **Strategic Implementation Directive** in Markdown.
-    
-    **Guidance on Tone & Accuracy:**
-    1.  **No Hallucinations:** Do not invent features, constraints, or budget numbers not found in the source text. If the text is silent, state "Not specified in documentation."
-    2.  **Citation Style:** When making a claim (e.g., "We must avoid accounting features"), reference the specific text or rule number from the Source Documentation.
-    3.  **Tone:** Direct, authoritative, and low-ego. Write for a CEO/Founder.
-    
-    Explain *why* this option won.
-    - Explicitly reference the "SUPPORTS" logs from the Engine Logic.
-    - Explicitly reference the "BLOCKS" logs that disqualified other approaches (if evident).
-    - Quote specific constraints from the Source Documentation (e.g., "Per Section 1.5, the product is NOT...").
+    ### REQUIRED OUTPUT FORMAT:
 
-    Propose a stack that fits the *constraints* found in the text.
-    - **Core Stack:** [Language/Framework] - justify why based on the text.
-    - **Database:** [SQL/NoSQL] - justify based on data structure needs.
-    - **Key Constraints:** List what we must NOT build (e.g., "No chat features").
+    ## 1. Executive Summary
+    [High-impact summary of the strategic value.]
 
-    A tight, weekly breakdown to hit the "MVP" definition found in the text.
-    - **Week 1:** [Foundation]
-    - **Week 2:** [Core Features]
-    - **Week 3:** [Integration/Refinement]
-    - **Week 4:** [Launch/Deployment]
+    ## 2. Strategic Rationale & Evidence
+    * **Why this won:** [Synthesize "SUPPORTS" evidence].
+    * **Verbatim Support:** [Quote 2-3 specific sentences from the docs that prove this is the right choice].
 
-    Analyze the "WEAKENS" or negative factors from the Engine Logic.
-    - **Risk:** [What is the risk?]
-    - **Mitigation:** [How do we fix it using the recommended stack?]
+    ## 3. System Architecture
+    [Brief description of the data flow.]
+    ```mermaid
+    graph TD
+    %% Create a detailed flow based on the specific constraints in the text
+    [Generate Mermaid Chart]
+    ```
+
+    ## 4. Technical Specifications
+    * **Stack:** [Language/Framework]
+    * **Database:** [SQL/NoSQL]
+    * **Infrastructure:** [Cloud/On-Prem details if in text]
+
+    ## 5. Generated Artifacts (MVP Starter Pack)
+    
+    **A. Database Schema (Draft)**
+    *Based on the data entities mentioned in the text (e.g., Users, Products, Orders).*
+    ```sql
+    -- Generate a CREATE TABLE SQL script based strictly on the fields mentioned in the docs
+    -- Example: If docs mention "User must have a phone number", add phone_number column.
+    ```
+
+    **B. Core API Endpoints**
+    *Based on the user actions described (e.g., "User uploads document").*
+    | Method | Endpoint | Description |
+    | :--- | :--- | :--- |
+    | POST | /example | [Description from docs] |
+
+    ## 6. Implementation Roadmap (Detailed)
+    **Week 1: Foundation**
+    * [Specific Task]
+    
+    **Week 2: Core Features**
+    * [Specific Task]
+
+    ## 7. Risk Assessment (Pre-Mortem)
+    * **Risk:** [Weakness from logs] -> **Mitigation:** [Specific fix]
     """
 
     response = client.models.generate_content(
