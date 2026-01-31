@@ -29,6 +29,15 @@ class DecisionCreate(BaseModel):
     title: str
 
 
+class DecisionResponse(BaseModel):
+    id: int
+    title: str
+    description: str | None = None
+
+    class Config:
+        from_attributes = True
+
+
 def get_db():
     db = SessionLocal()
     try:
@@ -37,11 +46,12 @@ def get_db():
         db.close()
 
 
-@app.post("/decisions")
+@app.post("/decisions", response_model=DecisionResponse)
 def create_decision(decision_in: DecisionCreate, db: Session = Depends(get_db)):
     new_decision = Decision(title=decision_in.title, description="User created project")
     db.add(new_decision)
     db.commit()
+
     db.refresh(new_decision)
 
     opt1 = DecisionOption(decision_id=new_decision.id, name="Option A (Proceed)")
