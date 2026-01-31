@@ -125,8 +125,8 @@ export default function DecisionResult({ decisionId }: DecisionResultProps) {
                     key={option.option_id}
                     className={`relative p-6 rounded-[2rem] border transition-all overflow-hidden shadow-lg group ${
                       isWinner
-                        ? "bg-white/60 border-white ring-4 ring-green-400/20"
-                        : "bg-white/30 border-white/40"
+                        ? "bg-white/55 border-white ring-4 ring-green-400/20"
+                        : "bg-white/20 border-white/40"
                     }`}
                   >
                     <div className="absolute top-0 left-0 w-full h-[40%] bg-gradient-to-b from-white/40 to-transparent pointer-events-none" />
@@ -172,14 +172,13 @@ export default function DecisionResult({ decisionId }: DecisionResultProps) {
             </div>
           </div>
 
-          {/* Right Column: Strategic Directive (The Glass Report) */}
           <div className="lg:col-span-2">
             <h3 className="font-black text-white uppercase tracking-widest text-xs flex items-center gap-2 mb-6 ml-4 drop-shadow-md">
               <FileText className="text-blue-200 drop-shadow-sm" size={18} />
               Strategic Directive
             </h3>
 
-            <div className="relative bg-white/50 backdrop-blur-3xl border border-white/70 rounded-[3rem] p-10 shadow-2xl min-h-[500px] overflow-hidden">
+            <div className="relative bg-white/40 backdrop-blur-3xl border border-white/70 rounded-[3rem] p-10 shadow-2xl min-h-[500px] overflow-hidden">
               <div className="absolute top-0 left-0 w-full h-[15%] bg-gradient-to-b from-white/40 to-transparent pointer-events-none" />
 
               <article className="relative z-10 prose prose-slate prose-sm sm:prose-base max-w-none">
@@ -255,12 +254,13 @@ export default function DecisionResult({ decisionId }: DecisionResultProps) {
                         const isMermaid = match && match[1] === "mermaid";
 
                         if (!inline && isMermaid) {
+                          const cleanChart = String(children)
+                            .replace(/\u00A0/g, " ") // Replaces non-breaking spaces with normal spaces
+                            .replace(/\n$/, "");
+
                           return (
-                            /* Fixed Wrapper: block-level span prevents the <p> nesting crash while keeping the style */
                             <span className="block my-8 p-6 bg-white/20 backdrop-blur-xl rounded-[2.5rem] border border-white/60 shadow-inner overflow-x-auto">
-                              <MermaidChart
-                                chart={String(children).replace(/\n$/, "")}
-                              />
+                              <MermaidChart chart={cleanChart} />
                             </span>
                           );
                         }
