@@ -1,14 +1,12 @@
 import { api } from "../api/api";
 
 interface DecisionResult {
-  data: {
-    decision_id: number;
-    ranked_options: Array<{
-      option_id: number;
-      score: number;
-      reasons: string[];
-    }>;
-  };
+  decision_id: number;
+  ranked_options: Array<{
+    option_id: number;
+    score: number;
+    reasons: string[];
+  }>;
   consultant_report: string;
 }
 
