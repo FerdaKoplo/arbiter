@@ -129,9 +129,3 @@ This policy is enforced across the pipeline and surfaced in generated reports.
 - Expect outputs to contain two clearly labeled sections: **Documented Facts** and **Recommendations**. Each recommendation must cite supporting evidence or explicitly note the lack thereof.
 
 ---
-
-## Contributing
-
-Contributions are welcome. For major changes, open an issue describing the motivation and design, and follow the repository's contribution guidelines.
-
----
