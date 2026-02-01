@@ -4,7 +4,7 @@ Arbiter is a decision-support platform that transforms unstructured evidence (PD
 
 ---
 
-## Quick Start (Judge's Guide)
+## Quick Start
 
 Follow these steps to run the application locally.
 
