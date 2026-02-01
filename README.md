@@ -135,7 +135,3 @@ This policy is enforced across the pipeline and surfaced in generated reports.
 Contributions are welcome. For major changes, open an issue describing the motivation and design, and follow the repository's contribution guidelines.
 
 ---
-
-## License
-
-Specify the project license in the repository (e.g., MIT, Apache-2.0) as appropriate.
