@@ -75,7 +75,7 @@ Arbiter ingests project documentation and executes a multi-stage analysis:
 
 ---
 
-## Key Features for Judges
+## Key Features
 
 - **Verbatim Evidence System:** Every recommendation is linked back to specific quotes in source documents.
 - **Anti-Hallucination Logic:** Enforces a strict "Source Truth" policy. If a technical detail is not present in the source, the system either marks it as unspecified or produces an "Informed Recommendation" instead of guessing.
@@ -86,26 +86,12 @@ Arbiter ingests project documentation and executes a multi-stage analysis:
 
 ## Architecture (High-level)
 
-The system follows a simple, judge-friendly pipeline focused on clarity and reproducibility rather than raw performance:
-
-```
-Frontend (Visualization)
-        ↓
-Backend API (Orchestrator)
-        ↓
-Reasoning Pipeline
-        ↓
-Persistent Store
-```
-
 Design priorities:
 
 - Fast iteration
 - Explicit state and structure
 - Diagrammability
 - Clear orchestration for the AI engine
-
-Do not over-engineer for scale — judges evaluate clarity and correctness more than premature optimization.
 
 ---
 
@@ -153,9 +139,3 @@ Contributions are welcome. For major changes, open an issue describing the motiv
 ## License
 
 Specify the project license in the repository (e.g., MIT, Apache-2.0) as appropriate.
-
----
-
-## Contact
-
-For questions about judging or technical details, open an issue on the repository or contact the maintainers listed in the project metadata.
