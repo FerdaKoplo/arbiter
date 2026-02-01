@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useCreateDecision } from "../hooks/useDecision";
-import { ArrowRight, BrainCircuit, Loader2 } from "lucide-react";
+import { ArrowRight, Loader2 } from "lucide-react";
 
 const HomePage = () => {
   const [title, setTitle] = useState<string>("");

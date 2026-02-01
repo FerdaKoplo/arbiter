@@ -52,7 +52,6 @@ export default function DecisionResult({ decisionId }: DecisionResultProps) {
 
   return (
     <div className="w-full space-y-8">
-      {/* Top Engine Control - Glassmorphism Card */}
       <div className="relative flex items-center justify-between p-8 bg-white/40 backdrop-blur-3xl rounded-[2.5rem] border border-white/60 shadow-[0_20px_40px_-15px_rgba(0,0,0,0.2)] overflow-hidden">
         <div className="absolute top-0 left-0 w-full h-[40%] bg-gradient-to-b from-white/50 to-transparent pointer-events-none" />
 
@@ -109,65 +108,66 @@ export default function DecisionResult({ decisionId }: DecisionResultProps) {
 
       {result && (
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
-          {/* Left Column: Ranked Options */}
-          <div className="lg:col-span-1 space-y-6">
-            <h3 className="font-black text-white uppercase tracking-widest text-xs flex items-center gap-2 ml-4 drop-shadow-md">
-              <Trophy className="text-yellow-400 drop-shadow-sm" size={18} />
-              Ranked Options
-            </h3>
+          <div className="lg:col-span-1 relative">
+            <div className=" sticky top-8 space-y-6 self-start pr-2">
+              <h3 className="font-black text-white uppercase tracking-widest text-xs flex items-center gap-2 ml-4 drop-shadow-md">
+                <Trophy className="text-yellow-400 drop-shadow-sm" size={18} />
+                Ranked Options
+              </h3>
 
-            <div className="space-y-4">
-              {result.ranked_options.map((option, idx) => {
-                const isWinner = idx === 0;
-                return (
-                  <div
-                    key={option.option_id}
-                    className={`relative p-6 rounded-[2rem] border transition-all overflow-hidden shadow-lg group ${
-                      isWinner
-                        ? "bg-white/55 border-white ring-4 ring-green-400/20"
-                        : "bg-white/20 border-white/40"
-                    }`}
-                  >
-                    <div className="absolute top-0 left-0 w-full h-[40%] bg-gradient-to-b from-white/40 to-transparent pointer-events-none" />
+              <div className="space-y-4">
+                {result.ranked_options.map((option, idx) => {
+                  const isWinner = idx === 0;
+                  return (
+                    <div
+                      key={option.option_id}
+                      className={`relative p-6 rounded-[2rem] border transition-all overflow-hidden shadow-lg group ${
+                        isWinner
+                          ? "bg-white/55 border-white ring-4 ring-green-400/20"
+                          : "bg-white/20 border-white/40"
+                      }`}
+                    >
+                      <div className="absolute top-0 left-0 w-full h-[40%] bg-gradient-to-b from-white/40 to-transparent pointer-events-none" />
 
-                    <div className="relative z-10 flex justify-between items-center mb-4 text-white">
-                      <span className="font-black text-lg drop-shadow-sm">
-                        {idx + 1}. Option {option.option_id}
-                      </span>
-                      <span className="font-mono text-2xl font-black drop-shadow-sm">
-                        {option.score.toFixed(2)}
-                      </span>
+                      <div className="relative z-10 flex justify-between items-center mb-4 text-white">
+                        <span className="font-black text-lg drop-shadow-sm">
+                          {idx + 1}. Option {option.option_id}
+                        </span>
+                        <span className="font-mono text-2xl font-black drop-shadow-sm">
+                          {option.score.toFixed(2)}
+                        </span>
+                      </div>
+
+                      <div className="relative z-10 space-y-2">
+                        {sortReasons(option.reasons)
+                          .slice(0, 4)
+                          .map((reason, rIdx) => (
+                            <div
+                              key={rIdx}
+                              className="text-xs font-bold text-white/90 truncate flex items-start gap-2"
+                            >
+                              <CheckCircle2
+                                size={14}
+                                className={`shrink-0 ${isWinner ? "text-green-300" : "text-blue-300"}`}
+                              />
+                              <span title={reason}>
+                                {reason
+                                  .replace("GEMINI:", "")
+                                  .replace("SUPPORTS:", "")
+                                  .trim()}
+                              </span>
+                            </div>
+                          ))}
+                        {option.reasons.length > 4 && (
+                          <p className="text-[10px] text-white/60 font-black italic pl-5 tracking-tighter uppercase">
+                            + {option.reasons.length - 4} more factors
+                          </p>
+                        )}
+                      </div>
                     </div>
-
-                    <div className="relative z-10 space-y-2">
-                      {sortReasons(option.reasons)
-                        .slice(0, 4)
-                        .map((reason, rIdx) => (
-                          <div
-                            key={rIdx}
-                            className="text-xs font-bold text-white/90 truncate flex items-start gap-2"
-                          >
-                            <CheckCircle2
-                              size={14}
-                              className={`shrink-0 ${isWinner ? "text-green-300" : "text-blue-300"}`}
-                            />
-                            <span title={reason}>
-                              {reason
-                                .replace("GEMINI:", "")
-                                .replace("SUPPORTS:", "")
-                                .trim()}
-                            </span>
-                          </div>
-                        ))}
-                      {option.reasons.length > 4 && (
-                        <p className="text-[10px] text-white/60 font-black italic pl-5 tracking-tighter uppercase">
-                          + {option.reasons.length - 4} more factors
-                        </p>
-                      )}
-                    </div>
-                  </div>
-                );
-              })}
+                  );
+                })}
+              </div>
             </div>
           </div>
 

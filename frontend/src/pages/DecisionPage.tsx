@@ -9,7 +9,7 @@ const DecisionPage = () => {
   if (isNaN(decisionId)) return <div>Invalid ID</div>;
   return (
     <div className="relative min-h-screen px-4 py-10 overflow-x-hidden bg-linear-to-br from-[#0078D7] via-[#24e0ff] to-[#72ff8d]">
-      <div className="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] bg-white/10 blur-[120px] rounded-full" />
+      <div className="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] bg-white/40 blur-[120px] rounded-full" />
       <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-emerald-400/20 blur-[150px] rounded-full" />
 
       <div className="relative z-10 max-w-7xl mx-auto">
@@ -38,7 +38,6 @@ const DecisionPage = () => {
             <UploadDocument decisionId={decisionId} />
           </section>
 
-          {/* RESULTS SECTION */}
           <section className="relative">
             <DecisionResult decisionId={decisionId} />
           </section>

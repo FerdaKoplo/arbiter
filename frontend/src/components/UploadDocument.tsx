@@ -1,12 +1,6 @@
 import { useState } from "react";
 import { useUploadDocument } from "../hooks/useDecision";
-import {
-  UploadCloud,
-  FileText,
-  Loader2,
-  CheckCircle,
-  AlertCircle,
-} from "lucide-react";
+import { UploadCloud, FileText, Loader2, CheckCircle } from "lucide-react";
 
 interface UploadDocumentProps {
   decisionId: number;
