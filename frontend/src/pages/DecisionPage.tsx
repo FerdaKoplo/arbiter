@@ -14,10 +14,10 @@ const DecisionPage = () => {
 
       <div className="relative z-10 max-w-7xl mx-auto">
         <header className="mb-10 ml-4">
-          <h1 className="text-4xl font-black text-white drop-shadow-md tracking-tight uppercase">
+          <h1 className="text-4xl font-black text-white/70 drop-shadow-md tracking-tight uppercase">
             Decision #{decisionId}
           </h1>
-          <p className="text-white/80 font-bold tracking-widest uppercase text-xs">
+          <p className="text-white/40 drop-shadow-md font-bold tracking-widest uppercase text-xs">
             Project Workspace
           </p>
         </header>

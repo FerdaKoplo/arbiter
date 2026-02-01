@@ -74,11 +74,10 @@ export default function DecisionResult({ decisionId }: DecisionResultProps) {
             ${
               isLoading
                 ? "bg-slate-400/20 cursor-not-allowed"
-                : "bg-white/10 hover:bg-white/20 active:scale-95"
+                : "bg-white/10 hover:bg-white/35 active:scale-95"
             }
           `}
         >
-          {/* Button Gloss Sheen */}
           <div className="absolute top-0 left-0 w-full h-[45%] bg-gradient-to-b from-white/40 to-transparent pointer-events-none" />
 
           <span className="relative z-10 flex items-center gap-2">
